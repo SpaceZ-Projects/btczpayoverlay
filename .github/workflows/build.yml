@@ -20,12 +20,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ["Ubuntu", "Windows", "macOS"]
+        target: ["Ubuntu 24.04", "Windows", "macOS"]
+
         include:
-          - target: "Ubuntu"
+          - target: "Ubuntu 24.04"
             platform: "Linux"
             output-format: "system"
-            runs-on: "ubuntu-latest"
+            runs-on: "ubuntu-24.04"
             pre-command: |
               sudo apt-get update --fix-missing
               sudo apt-get install -y \
