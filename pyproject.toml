@@ -151,7 +151,7 @@ linuxdeploy_plugins = [
     "DEPLOY_GTK_VERSION=3 gtk",
 ]
 
-[tool.briefcase.app.insightbtczpayoverlaywallet.linux.flatpak]
+[tool.briefcase.app.btczpayoverlay.linux.flatpak]
 flatpak_runtime = "org.gnome.Platform"
 flatpak_runtime_version = "48"
 flatpak_sdk = "org.gnome.Sdk"
