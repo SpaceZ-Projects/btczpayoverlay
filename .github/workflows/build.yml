@@ -89,14 +89,13 @@ jobs:
               ${{ matrix.briefcase-args }}
 
           else
-            briefcase package Linux system \
+            briefcase package \
+              ${{ matrix.platform || matrix.target }} \
+              ${{ matrix.output-format }} \
               --update \
               --no-input \
               --log \
               ${{ matrix.briefcase-args }}
-
-            cd dist
-            zip -r BTCZPayOverlay-linux.zip *
           fi
 
       - name: Upload App (Linux / macOS)
