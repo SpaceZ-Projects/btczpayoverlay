@@ -1,6 +1,6 @@
 
 [tool.briefcase]
-project_name = "BitcoinZ Pay Overlay"
+project_name = "BTCZPayOverlay"
 bundle = "com.btcz.pay.overlay"
 version = "1.0.0"
 url = "https://pay.btcz.rocks"
@@ -12,7 +12,7 @@ author_email = "None"
 
 [tool.briefcase.app.btczpayoverlay]
 
-formal_name = "BitcoinZ Pay Overlay"
+formal_name = "BTCZPayOverlay"
 description = "BTCZPay Overlay real-time gift alerts for streamers"
 long_description = """BTCZPay Overlay real-time gift alerts for streamers, powered by BTCZPay SSE and WebSocket events"""
 icon = "btczpayoverlay/faveicon"
