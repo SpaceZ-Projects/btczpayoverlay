@@ -1,0 +1,35 @@
+
+[tool.briefcase]
+project_name = "BitcoinZ Pay Overlay"
+bundle = "com.btcz.pay.overlay"
+version = "1.0.0"
+url = "https://pay.btcz.rocks"
+license = "MIT"
+license-files = ["LICENSE"]
+author = "BTCZCommunity"
+author_email = "None"
+
+
+[tool.briefcase.app.btczpayoverlay]
+
+formal_name = "BitcoinZ Pay Overlay"
+description = "BTCZPay Overlay real-time gift alerts for streamers, powered by BTCZPay SSE and WebSocket events"
+long_description = """BTCZPay Overlay real-time gift alerts for streamers, powered by BTCZPay SSE and WebSocket events"""
+icon = "btczpayoverlay/faveicon"
+sources = [
+    "btczpayoverlay",
+]
+
+console_app = true
+
+test_sources = [
+    "tests",
+]
+
+requires = [
+    "aiohttp"
+]
+test_requires = [
+    "pytest",
+]
+
