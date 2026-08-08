@@ -168,6 +168,8 @@ The API key is entered securely using a hidden password prompt.
 
 # Starting the Overlay
 
+![Starting the Overlay](docs/screenshots/starting-overlay.png)
+
 Run:
 
 ```bash
