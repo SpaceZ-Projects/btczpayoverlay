@@ -199,6 +199,8 @@ The application is now waiting for BTCZPay events.
 
 # OBS Studio Setup
 
+![OBS Browser Source setup](docs/screenshots/obs-browser-source.png)
+
 After starting BTCZPay Overlay, open **OBS Studio**.
 
 ## 1. Add a Browser Source
