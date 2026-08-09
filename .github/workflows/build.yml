@@ -1,4 +1,5 @@
 name: Build
+
 on:
   workflow_dispatch:
 
@@ -15,63 +16,243 @@ defaults:
 
 jobs:
   ci:
-    name: Package
+    name: Package ${{ matrix.target }}
     runs-on: ${{ matrix.runs-on }}
+
     strategy:
       fail-fast: false
+
       matrix:
-        target: ["Ubuntu 24.04", "Windows", "macOS"]
+        target:
+          - "Ubuntu-Noble"
+          - "Ubuntu-Jammy"
+          - "Debian-Bookworm"
+          - "Debian-12"
+          - "Fedora-41"
+          - "AlmaLinux-9"
+          - "RedHat-UBI9"
+          - "OpenSUSE-Tumbleweed"
+          - "ArchLinux"
+          - "Manjaro"
+          - "Windows"
+          - "macOS"
 
         include:
-          - target: "Ubuntu 24.04"
+
+          # ============================================================
+          # Ubuntu 24.04 LTS - Noble
+          # ============================================================
+
+          - target: "Ubuntu-Noble"
             platform: "Linux"
             output-format: "system"
-            runs-on: "ubuntu-24.04"
-            pre-command: |
-              sudo apt-get update --fix-missing
-              sudo apt-get install -y \
-                socat libcairo2-dev libgirepository1.0-dev gir1.2-gtk-3.0 \
-                libcanberra-gtk3-module build-essential git uuid-dev \
-                libblkid-dev libmount-dev
+            runs-on: "ubuntu-latest"
             briefcase-run-prefix: "xvfb-run"
             briefcase-args: "--target ubuntu:noble"
 
+          # ============================================================
+          # Ubuntu 22.04 LTS - Jammy
+          # ============================================================
+
+          - target: "Ubuntu-Jammy"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target ubuntu:jammy"
+
+          # ============================================================
+          # Debian Bookworm
+          # ============================================================
+
+          - target: "Debian-Bookworm"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target debian:bookworm"
+
+          # ============================================================
+          # Debian 12
+          # ============================================================
+
+          - target: "Debian-12"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target debian:12"
+
+          # ============================================================
+          # Fedora 41
+          # ============================================================
+
+          - target: "Fedora-41"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target fedora:41"
+
+          # ============================================================
+          # AlmaLinux 9
+          # ============================================================
+
+          - target: "AlmaLinux-9"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target almalinux:9"
+
+          # ============================================================
+          # Red Hat UBI 9
+          # ============================================================
+
+          - target: "RedHat-UBI9"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target redhat/ubi9:9"
+
+          # ============================================================
+          # openSUSE Tumbleweed
+          # ============================================================
+
+          - target: "OpenSUSE-Tumbleweed"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target opensuse/tumbleweed:latest"
+
+          # ============================================================
+          # Arch Linux
+          # ============================================================
+
+          - target: "ArchLinux"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target archlinux:latest"
+
+          # ============================================================
+          # Manjaro
+          # ============================================================
+
+          - target: "Manjaro"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target manjarolinux/base:latest"
+
+          # ============================================================
+          # Windows
+          # ============================================================
+
           - target: "Windows"
+            platform: "Windows"
             output-format: "app"
             runs-on: "windows-latest"
+            briefcase-run-prefix: ""
+            briefcase-args: ""
+
+          # ============================================================
+          # macOS
+          # ============================================================
 
           - target: "macOS"
+            platform: "macOS"
             output-format: "app"
             runs-on: "macos-latest"
+            briefcase-run-prefix: ""
+            briefcase-args: ""
 
     steps:
+
+      # ================================================================
+      # Checkout
+      # ================================================================
+
       - name: Checkout
         uses: actions/checkout@v5
+
+      # ================================================================
+      # Setup Python
+      # ================================================================
 
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.10"
 
+      # ================================================================
+      # Install Briefcase
+      # ================================================================
+
       - name: Install Briefcase
         run: |
           python -m pip install --upgrade pip
           python -m pip install briefcase
 
-      - name: Setup Environment
-        run: ${{ matrix.pre-command }}
+      # ================================================================
+      # Install Linux host dependencies
+      # ================================================================
+
+      - name: Setup Linux Environment
+        if: matrix.platform == 'Linux'
+        run: |
+          sudo apt-get update --fix-missing
+
+          sudo apt-get install -y \
+            socat \
+            libcairo2-dev \
+            libgirepository1.0-dev \
+            gir1.2-gtk-3.0 \
+            libcanberra-gtk3-module \
+            build-essential \
+            git \
+            uuid-dev \
+            libblkid-dev \
+            libmount-dev \
+            xvfb
+
+      # ================================================================
+      # Build
+      # ================================================================
 
       - name: Build App
         run: |
-          ${{ matrix.briefcase-run-prefix }} \
-          briefcase build \
-            ${{ matrix.platform || matrix.target }} \
-            ${{ matrix.output-format }} \
-            ${{ matrix.briefcase-args }}
+
+          if [ "${{ matrix.platform }}" = "Linux" ]; then
+
+            ${{ matrix.briefcase-run-prefix }} \
+            briefcase build \
+              ${{ matrix.platform }} \
+              ${{ matrix.output-format }} \
+              ${{ matrix.briefcase-args }}
+
+          else
+
+            briefcase build \
+              ${{ matrix.platform }} \
+              ${{ matrix.output-format }} \
+              ${{ matrix.briefcase-args }}
+
+          fi
+
+      # ================================================================
+      # Package
+      # ================================================================
 
       - name: Package App
         run: |
+
           if [ "${{ matrix.target }}" = "macOS" ]; then
+
             briefcase package macOS app \
               --update \
               --no-input \
@@ -81,6 +262,7 @@ jobs:
               ${{ matrix.briefcase-args }}
 
           elif [ "${{ matrix.target }}" = "Windows" ]; then
+
             briefcase package Windows app \
               --update \
               --no-input \
@@ -89,28 +271,24 @@ jobs:
               ${{ matrix.briefcase-args }}
 
           else
+
             briefcase package \
-              ${{ matrix.platform || matrix.target }} \
+              ${{ matrix.platform }} \
               ${{ matrix.output-format }} \
               --update \
               --no-input \
               --log \
               ${{ matrix.briefcase-args }}
+
           fi
 
-      - name: Upload App (Linux / macOS)
-        if: matrix.target != 'Windows'
-        uses: actions/upload-artifact@v4
+      # ================================================================
+      # Upload Linux / macOS
+      # ================================================================
+
+      - name: Upload App
+        uses: actions/upload-artifact@v5
         with:
           name: BTCZPayOverlay-${{ matrix.target }}
           path: dist
-          if-no-files-found: warn
-
-      - name: Upload App (Windows)
-        if: matrix.target == 'Windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: BTCZPayOverlay
-          path: |
-            dist/*.zip
           if-no-files-found: warn
