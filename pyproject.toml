@@ -2,7 +2,7 @@
 [tool.briefcase]
 project_name = "BTCZPayOverlay"
 bundle = "com.btcz.pay.overlay"
-version = "1.0.0"
+version = "1.1.0"
 url = "https://pay.btcz.rocks"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -34,10 +34,10 @@ test_requires = [
 
 [tool.briefcase.app.btczpayoverlay.macOS]
 universal_build = true
-requires = ["aiohttp"]
+requires = ["aiohttp", "pyaes"]
 
 [tool.briefcase.app.btczpayoverlay.linux]
-requires = ["aiohttp"]
+requires = ["aiohttp", "pyaes"]
 
 [tool.briefcase.app.btczpayoverlay.linux.system.debian]
 system_requires = [
@@ -157,4 +157,4 @@ flatpak_runtime_version = "48"
 flatpak_sdk = "org.gnome.Sdk"
 
 [tool.briefcase.app.btczpayoverlay.windows]
-requires = ["aiohttp"]
+requires = ["aiohttp", "pyaes"]
