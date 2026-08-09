@@ -20,10 +20,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ["Ubuntu", "Windows", "macOS"]
+        target: ["Ubuntu 24.04", "Windows", "macOS"]
 
         include:
-          - target: "Ubuntu"
+          - target: "Ubuntu 24.04"
             platform: "Linux"
             output-format: "system"
             runs-on: "ubuntu-24.04"
@@ -34,6 +34,7 @@ jobs:
                 libcanberra-gtk3-module build-essential git uuid-dev \
                 libblkid-dev libmount-dev
             briefcase-run-prefix: "xvfb-run"
+            briefcase-args: "--target ubuntu:noble"
 
           - target: "Windows"
             output-format: "app"
@@ -50,52 +51,51 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.10"
 
       - name: Install Briefcase
         run: |
-          if [ "${{ matrix.target }}" = "Ubuntu" ]; then
-            python3 -m venv .briefcase-venv
-            . .briefcase-venv/bin/activate
-            python -m pip install --upgrade pip
-            python -m pip install briefcase
-          else
-            python -m pip install --upgrade pip
-            python -m pip install briefcase
-          fi
+          python -m pip install --upgrade pip
+          python -m pip install briefcase
 
       - name: Setup Environment
         run: ${{ matrix.pre-command }}
 
+      - name: Build App
+        run: |
+          ${{ matrix.briefcase-run-prefix }} \
+          briefcase build \
+            ${{ matrix.platform || matrix.target }} \
+            ${{ matrix.output-format }} \
+            ${{ matrix.briefcase-args }}
+
       - name: Package App
         run: |
-          if [ "${{ matrix.target }}" = "Ubuntu" ]; then
-            source .briefcase-venv/bin/activate
-          fi
-
           if [ "${{ matrix.target }}" = "macOS" ]; then
             briefcase package macOS app \
               --update \
               --no-input \
               --log \
               --adhoc-sign \
-              -p pkg
+              -p pkg \
+              ${{ matrix.briefcase-args }}
 
           elif [ "${{ matrix.target }}" = "Windows" ]; then
             briefcase package Windows app \
               --update \
               --no-input \
               --log \
-              -p zip
+              -p zip \
+              ${{ matrix.briefcase-args }}
 
           else
-            ${{ matrix.briefcase-run-prefix }} \
             briefcase package \
               ${{ matrix.platform || matrix.target }} \
               ${{ matrix.output-format }} \
               --update \
               --no-input \
-              --log
+              --log \
+              ${{ matrix.briefcase-args }}
           fi
 
       - name: Upload App (Linux / macOS)
