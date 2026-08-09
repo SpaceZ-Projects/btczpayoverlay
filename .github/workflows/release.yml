@@ -52,8 +52,7 @@ jobs:
               -o -name "*.rpm" \
               -o -name "*.zip" \
               -o -name "*.pkg" \
-              -o -name "*.AppImage" \
-              -o -name "*.tar.gz" \
+              -o -name "*.pkg.tar.zst" \
             \) \
             -exec cp {} release-files/ \;
 
