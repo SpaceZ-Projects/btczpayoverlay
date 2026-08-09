@@ -34,7 +34,7 @@ test_requires = [
 
 [tool.briefcase.app.btczpayoverlay.macOS]
 universal_build = true
-requires = ["aiohttp", "pyaes"]
+requires = ["aiohttp", "pycryptodome"]
 
 [tool.briefcase.app.btczpayoverlay.linux]
 requires = ["aiohttp", "pyaes"]

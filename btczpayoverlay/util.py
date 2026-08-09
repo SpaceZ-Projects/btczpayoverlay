@@ -7,6 +7,11 @@ import hashlib
 
 AES = None
 
+try:
+    import pyaes
+except ImportError:
+    from Crypto.Cipher import AES
+
 
 def is_readable_key(key):
     if not isinstance(key, str):
