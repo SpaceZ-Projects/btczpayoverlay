@@ -54,28 +54,39 @@ jobs:
 
       - name: Install Briefcase
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install briefcase
+          if [ "${{ matrix.target }}" = "Ubuntu" ]; then
+            python3 -m venv .briefcase-venv
+            . .briefcase-venv/bin/activate
+            python -m pip install --upgrade pip
+            python -m pip install briefcase
+          else
+            python -m pip install --upgrade pip
+            python -m pip install briefcase
+          fi
 
       - name: Setup Environment
         run: ${{ matrix.pre-command }}
 
       - name: Package App
         run: |
+          if [ "${{ matrix.target }}" = "Ubuntu" ]; then
+            source .briefcase-venv/bin/activate
+          fi
+
           if [ "${{ matrix.target }}" = "macOS" ]; then
             briefcase package macOS app \
               --update \
               --no-input \
               --log \
               --adhoc-sign \
-              -p pkg 
+              -p pkg
 
           elif [ "${{ matrix.target }}" = "Windows" ]; then
             briefcase package Windows app \
               --update \
               --no-input \
               --log \
-              -p zip 
+              -p zip
 
           else
             ${{ matrix.briefcase-run-prefix }} \
@@ -84,7 +95,7 @@ jobs:
               ${{ matrix.output-format }} \
               --update \
               --no-input \
-              --log 
+              --log
           fi
 
       - name: Upload App (Linux / macOS)
