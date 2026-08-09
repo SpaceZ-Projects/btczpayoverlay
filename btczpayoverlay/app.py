@@ -1,5 +1,4 @@
 
-
 import os
 import asyncio
 import json
@@ -7,6 +6,8 @@ import getpass
 
 from aiohttp import web
 import aiohttp
+
+from .util import pw_decode, pw_encode, is_readable_key
 
 
 overlay_clients = set()
@@ -18,6 +19,15 @@ def load_config(path="config.json"):
         raise FileNotFoundError("config.json not found")
     with open(config, "r") as f:
         return json.load(f)
+
+
+def save_config(config, path="config.json"):
+    config_path = os.path.join(base_path, path)
+
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(config, f, indent=4)
+
+    print("[CONFIG] Configuration saved.")
 
 
 async def websocket_handler(request):
@@ -153,11 +163,11 @@ async def sse_loop(endpoint, key):
         except asyncio.CancelledError:
             raise
 
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
         print("[SSE] Reconnecting...")
-        await asyncio.sleep(1)
+        await asyncio.sleep(10)
 
 
 async def main():
@@ -187,13 +197,34 @@ async def main():
             print("[ERROR] API endpoint is required")
             return
 
-    key = server.get("key")
-    if not key:
+    key = server.get("key", None)
+    if key:
+        if not is_readable_key(key):
+            password = getpass.getpass("    Enter password: ")
+            if not password:
+                print("[ERROR] Encrypted key unlocked, password is required")
+                return
+            try:
+                dec_key = pw_decode(key, password)
+                key = dec_key
+            except Exception:
+                print("[ERROR] Invalid password")
+                return
+    else:
         print("[!] Server key is missing from config.json")
         key = getpass.getpass("    Enter Server key: ").strip()
         if not key:
             print("[ERROR] Server key is required")
             return
+        password = getpass.getpass("    Enter password: ")
+        if password:
+            enc_key = pw_encode(key, password)
+            server["key"] = enc_key
+        else:
+            server["key"] = key
+
+        save_config(config)
+        
 
     print()
     print("[CONFIG]")

@@ -77,7 +77,7 @@ When a new invoice status event is received:
 You need:
 
 - Python 3.10+
-- `briefcase` `aiohttp`
+- `briefcase` `aiohttp` `pyaes`
 - OBS Studio
 - A BTCZPay account/profile
 - A BTCZPay API key
