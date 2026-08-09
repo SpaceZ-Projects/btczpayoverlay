@@ -30,8 +30,6 @@ jobs:
           - "Debian-Bookworm"
           - "Debian-12"
           - "Fedora-41"
-          - "AlmaLinux-9"
-          - "RedHat-UBI9"
           - "OpenSUSE-Tumbleweed"
           - "ArchLinux"
           - "Manjaro"
@@ -94,28 +92,6 @@ jobs:
             runs-on: "ubuntu-latest"
             briefcase-run-prefix: "xvfb-run"
             briefcase-args: "--target fedora:41"
-
-          # ============================================================
-          # AlmaLinux 9
-          # ============================================================
-
-          - target: "AlmaLinux-9"
-            platform: "Linux"
-            output-format: "system"
-            runs-on: "ubuntu-latest"
-            briefcase-run-prefix: "xvfb-run"
-            briefcase-args: "--target almalinux:9"
-
-          # ============================================================
-          # Red Hat UBI 9
-          # ============================================================
-
-          - target: "RedHat-UBI9"
-            platform: "Linux"
-            output-format: "system"
-            runs-on: "ubuntu-latest"
-            briefcase-run-prefix: "xvfb-run"
-            briefcase-args: "--target redhat/ubi9:9"
 
           # ============================================================
           # openSUSE Tumbleweed
