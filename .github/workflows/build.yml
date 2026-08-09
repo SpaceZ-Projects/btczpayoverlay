@@ -264,7 +264,7 @@ jobs:
       # ================================================================
 
       - name: Upload App
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: BTCZPayOverlay-${{ matrix.target }}
           path: dist
