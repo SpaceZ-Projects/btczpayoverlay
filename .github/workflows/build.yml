@@ -20,10 +20,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ["Ubuntu 24.04", "Windows", "macOS"]
+        target: ["Ubuntu", "Windows", "macOS"]
 
         include:
-          - target: "Ubuntu 24.04"
+          - target: "Ubuntu"
             platform: "Linux"
             output-format: "system"
             runs-on: "ubuntu-24.04"
@@ -34,7 +34,6 @@ jobs:
                 libcanberra-gtk3-module build-essential git uuid-dev \
                 libblkid-dev libmount-dev
             briefcase-run-prefix: "xvfb-run"
-            briefcase-args: "--target ubuntu"
 
           - target: "Windows"
             output-format: "app"
@@ -61,14 +60,6 @@ jobs:
       - name: Setup Environment
         run: ${{ matrix.pre-command }}
 
-      - name: Build App
-        run: |
-          ${{ matrix.briefcase-run-prefix }} \
-          briefcase build \
-            ${{ matrix.platform || matrix.target }} \
-            ${{ matrix.output-format }} \
-            ${{ matrix.briefcase-args }}
-
       - name: Package App
         run: |
           if [ "${{ matrix.target }}" = "macOS" ]; then
@@ -77,25 +68,23 @@ jobs:
               --no-input \
               --log \
               --adhoc-sign \
-              -p pkg \
-              ${{ matrix.briefcase-args }}
+              -p pkg 
 
           elif [ "${{ matrix.target }}" = "Windows" ]; then
             briefcase package Windows app \
               --update \
               --no-input \
               --log \
-              -p zip \
-              ${{ matrix.briefcase-args }}
+              -p zip 
 
           else
+            ${{ matrix.briefcase-run-prefix }} \
             briefcase package \
               ${{ matrix.platform || matrix.target }} \
               ${{ matrix.output-format }} \
               --update \
               --no-input \
-              --log \
-              ${{ matrix.briefcase-args }}
+              --log 
           fi
 
       - name: Upload App (Linux / macOS)
