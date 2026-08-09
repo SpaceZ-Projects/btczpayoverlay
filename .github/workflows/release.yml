@@ -46,16 +46,49 @@ jobs:
         run: |
           mkdir -p release-files
 
-          find release-assets -type f \
-            \( \
-              -name "*.deb" \
-              -o -name "*.rpm" \
-              -o -name "*.zip" \
-              -o -name "*.pkg" \
-              -o -name "*.pkg.tar.zst" \
-            \) \
-            -exec cp {} release-files/ \;
+          for dir in release-assets/BTCZPayOverlay-*; do
+            [ -d "$dir" ] || continue
 
+            target=$(basename "$dir" | sed 's/^BTCZPayOverlay-//')
+
+            for file in "$dir"/*; do
+              [ -f "$file" ] || continue
+
+              filename=$(basename "$file")
+              extension=""
+
+              case "$filename" in
+                *.deb)
+                  extension=".deb"
+                  ;;
+                *.rpm)
+                  extension=".rpm"
+                  ;;
+                *.zip)
+                  extension=".zip"
+                  ;;
+                *.pkg)
+                  extension=".pkg"
+                  ;;
+                *.pkg.tar.zst)
+                  extension=".pkg.tar.zst"
+                  ;;
+                *)
+                  extension=""
+                  ;;
+              esac
+
+              base="${filename%$extension}"
+
+              new_name="${base}-${target}${extension}"
+
+              echo "$filename -> $new_name"
+
+              cp "$file" "release-files/$new_name"
+            done
+          done
+
+          echo ""
           echo "Release files:"
           ls -lh release-files
 
