@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows:
+      - Build
+    types:
+      - completed
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    name: Upload Build to Latest Release
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------------------------------------
+      # Download artifacts from the completed Build workflow
+      # ------------------------------------------------------------
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: release-assets
+
+      # ------------------------------------------------------------
+      # Show what was downloaded
+      # ------------------------------------------------------------
+
+      - name: List Build Artifacts
+        run: |
+          echo "Build artifacts:"
+          find release-assets -type f -print
+
+      # ------------------------------------------------------------
+      # Prepare release files
+      # ------------------------------------------------------------
+
+      - name: Prepare Release Assets
+        run: |
+          mkdir -p release-files
+
+          find release-assets -type f \
+            \( \
+              -name "*.deb" \
+              -o -name "*.rpm" \
+              -o -name "*.zip" \
+              -o -name "*.pkg" \
+              -o -name "*.AppImage" \
+              -o -name "*.tar.gz" \
+            \) \
+            -exec cp {} release-files/ \;
+
+          echo "Release files:"
+          ls -lh release-files
+
+      # ------------------------------------------------------------
+      # Find latest GitHub Release
+      # ------------------------------------------------------------
+
+      - name: Get Latest Release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=$(gh release list \
+            --repo "${{ github.repository }}" \
+            --limit 1 \
+            --json tagName \
+            --jq '.[0].tagName')
+
+          if [ -z "$TAG" ]; then
+            echo "No GitHub release found."
+            exit 1
+          fi
+
+          echo "Latest release: $TAG"
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------------
+      # Upload assets
+      # ------------------------------------------------------------
+
+      - name: Upload Assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload \
+            "${{ steps.release.outputs.tag }}" \
+            release-files/* \
+            --repo "${{ github.repository }}" \
+            --clobber
